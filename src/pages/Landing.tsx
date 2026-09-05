@@ -7,8 +7,16 @@ import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/hooks/use-auth";
 import { toPersianDigits } from "@/lib/format";
 import { useQuery } from "convex/react";
+import { motion } from "framer-motion";
 import { ClipboardCheck, MapPin, Sprout, Store, Users } from "lucide-react";
 import { Link } from "react-router";
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 24 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: "-60px" },
+  transition: { duration: 0.55, ease: "easeOut" as const },
+};
 
 export default function Landing() {
   const { user } = useAuth();
@@ -46,7 +54,16 @@ export default function Landing() {
               <Button asChild size="lg" className="rounded-full">
                 <Link to="/shop">مشاهده محصولات</Link>
               </Button>
-              {!user && (
+              {user ? (
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="rounded-full bg-card/60"
+                >
+                  <Link to="/dashboard">پیشخوان من</Link>
+                </Button>
+              ) : (
                 <Button
                   asChild
                   size="lg"
@@ -91,7 +108,10 @@ export default function Landing() {
 
       {/* Categories */}
       {categories && categories.length > 0 && (
-        <section className="mx-auto max-w-6xl px-4 py-12">
+        <motion.section
+          {...fadeInUp}
+          className="mx-auto max-w-6xl px-4 py-12"
+        >
           <div className="divider-ornate mb-8">
             <h2 className="font-display text-2xl font-extrabold">دسته‌بندی‌ها</h2>
           </div>
@@ -109,11 +129,11 @@ export default function Landing() {
               </Link>
             ))}
           </div>
-        </section>
+        </motion.section>
       )}
 
       {/* Featured */}
-      <section className="mx-auto max-w-6xl px-4 pb-12">
+      <motion.section {...fadeInUp} className="mx-auto max-w-6xl px-4 pb-12">
         <div className="divider-ornate mb-8">
           <h2 className="font-display text-2xl font-extrabold">منتخب هم‌بن</h2>
         </div>
@@ -122,11 +142,14 @@ export default function Landing() {
             <ProductCard key={p._id} product={p} />
           ))}
         </div>
-      </section>
+      </motion.section>
 
       {/* Seasonal */}
       {seasonal.length > 0 && (
-        <section className="border-y border-border/70 bg-secondary/30">
+        <motion.section
+          {...fadeInUp}
+          className="border-y border-border/70 bg-secondary/30"
+        >
           <div className="mx-auto max-w-6xl px-4 py-12">
             <div className="divider-ornate mb-8">
               <h2 className="font-display text-2xl font-extrabold">
@@ -139,11 +162,11 @@ export default function Landing() {
               ))}
             </div>
           </div>
-        </section>
+        </motion.section>
       )}
 
       {/* Why us */}
-      <section className="mx-auto max-w-6xl px-4 py-14">
+      <motion.section {...fadeInUp} className="mx-auto max-w-6xl px-4 py-14">
         <div className="divider-ornate mb-10">
           <h2 className="font-display text-2xl font-extrabold">
             چرا هم‌بن؟
@@ -186,10 +209,13 @@ export default function Landing() {
             </div>
           ))}
         </div>
-      </section>
+      </motion.section>
 
       {/* Story / CTA */}
-      <section className="border-t border-border/70 bg-secondary/30">
+      <motion.section
+        {...fadeInUp}
+        className="border-t border-border/70 bg-secondary/30"
+      >
         <div className="mx-auto max-w-4xl px-4 py-16 text-center">
           <p className="text-sm text-muted-foreground">داستان تولید ما</p>
           <h2 className="mt-3 font-display text-3xl font-extrabold leading-[1.6]">
@@ -206,7 +232,16 @@ export default function Landing() {
             <Button asChild size="lg" className="rounded-full">
               <Link to="/shop">مشاهده محصولات</Link>
             </Button>
-            {!user && (
+            {user ? (
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="rounded-full bg-card"
+              >
+                <Link to="/dashboard">پیشخوان من</Link>
+              </Button>
+            ) : (
               <Button
                 asChild
                 size="lg"
@@ -222,7 +257,7 @@ export default function Landing() {
             منتخب در فروشگاه
           </p>
         </div>
-      </section>
+      </motion.section>
 
       <SiteFooter />
     </div>

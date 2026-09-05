@@ -10,8 +10,8 @@ import {
 } from "react";
 
 /**
- * Cart with guest support: localStorage-backed cart, merged into the server
- * on sign-in (server is source of truth), then cleared locally.
+ * Cart with guest support: localStorage-backed cart, usable before sign-in.
+ * Checkout requires an account, where the server becomes the source of truth.
  */
 
 export interface CartItem {

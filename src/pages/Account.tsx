@@ -14,19 +14,26 @@ import {
 import { useMutation, useQuery } from "convex/react";
 import { Loader2, PackageSearch, X } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { toast } from "sonner";
 import type { Id } from "@/convex/_generated/dataModel";
 
 export default function Account() {
   const { user } = useAuth();
   const orders = useQuery(api.orders.myOrders, {});
   const cancel = useMutation(api.orders.cancel);
+  const navigate = useNavigate();
   const [cancellingId, setCancellingId] = useState<Id<"orders"> | null>(null);
 
   const handleCancel = async (orderId: Id<"orders">) => {
     setCancellingId(orderId);
     try {
       await cancel({ orderId });
+      toast.success("سفارش لغو شد و موجودی کالاها بازگشت.");
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "لغو سفارش ناموفق بود.",
+      );
     } finally {
       setCancellingId(null);
     }
@@ -60,7 +67,13 @@ export default function Account() {
             {orders.map((order) => (
               <div
                 key={order._id}
-                className="paper-grain rounded-lg border border-border bg-card p-5"
+                role="link"
+                tabIndex={0}
+                onClick={() => navigate(`/order/${order._id}`)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") navigate(`/order/${order._id}`);
+                }}
+                className="paper-grain cursor-pointer rounded-lg border border-border bg-card p-5 transition-all hover:border-primary/40 hover:shadow-md"
               >
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
