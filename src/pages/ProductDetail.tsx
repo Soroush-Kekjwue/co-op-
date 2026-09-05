@@ -18,6 +18,7 @@ import {
   toPersianDigits,
 } from "@/lib/format";
 import { useMutation, useQuery } from "convex/react";
+import { QRCodeSVG } from "qrcode.react";
 import {
   ArrowLeft,
   CalendarDays,
@@ -83,6 +84,8 @@ export default function ProductDetail() {
   const passedCount = checkedBatches.filter(
     (p) => p.latestCheck?.status === "passed",
   ).length;
+  // QR printed on packaging: scanning opens this product's passport page.
+  const passportUrl = `${window.location.origin}/product/${slug ?? ""}`;
 
   const infoRows = [
     { icon: MapPin, label: "مبدأ", value: product.origin },
@@ -268,7 +271,25 @@ export default function ProductDetail() {
               هنوز بچی برای این محصول ثبت نشده است.
             </div>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div className="archival-frame paper-grain flex flex-col items-center justify-center rounded-lg bg-card p-5 text-center">
+                <div className="rounded-lg border border-border bg-white p-3">
+                  <QRCodeSVG
+                    value={passportUrl}
+                    size={128}
+                    aria-label="کد شناسنامه محصول"
+                  />
+                </div>
+                <p className="mt-3 font-display text-sm font-bold">
+                  شناسنامه قابل استعلام
+                </p>
+                <p className="mt-1 text-xs leading-6 text-muted-foreground">
+                  با دوربین موبایل اسکن کنید و شناسنامه محصول را ببینید.
+                </p>
+                <p className="mt-2 font-mono text-xs text-accent-foreground">
+                  {passport[0]?.batch.batchCode ?? ""}
+                </p>
+              </div>
               {passport.map(({ batch, latestCheck }) => (
                 <div
                   key={batch._id}
