@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,9 +15,11 @@ import { toPersianDigits } from "@/lib/format";
 import {
   LayoutDashboard,
   LogOut,
+  Menu,
   Package,
   Search,
   ShoppingCart,
+  Sprout,
   UserRound,
 } from "lucide-react";
 import { useState } from "react";
@@ -72,8 +75,9 @@ export function SiteHeader() {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="جستجوی محصول…"
-            className="h-9 w-40 bg-background/60 pr-9 text-sm md:w-52"
+            placeholder="چه چیزی برای سفره‌تان می‌خواهید؟"
+            aria-label="جستجوی محصول"
+            className="h-9 w-44 bg-background/60 pr-9 text-sm md:w-56"
           />
         </form>
 
@@ -84,7 +88,7 @@ export function SiteHeader() {
             size="icon"
             className="relative rounded-full bg-background/60"
           >
-            <Link to="/cart" aria-label="سبد خرید">
+            <Link to="/cart" aria-label={`سبد خرید${count > 0 ? `، ${toPersianDigits(count)} کالا` : ""}`}>
               <ShoppingCart className="size-4" />
               {count > 0 && (
                 <span className="absolute -top-1 -left-1 flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
@@ -145,6 +149,53 @@ export function SiteHeader() {
               <Link to="/auth?returnTo=%2Fshop">ورود | ثبت‌نام</Link>
             </Button>
           )}
+
+          {/* Mobile navigation sheet */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-full bg-background/60 md:hidden"
+                aria-label="منوی اصلی"
+              >
+                <Menu className="size-4" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-72">
+              <SheetHeader>
+                <SheetTitle className="flex items-center gap-2 font-display">
+                  <span className="vintage-stamp flex size-8 items-center justify-center text-base">
+                    هـ
+                  </span>
+                  هم‌بن
+                </SheetTitle>
+              </SheetHeader>
+              <nav className="mt-2 flex flex-col gap-1 px-4">
+                {[
+                  { to: "/", label: "خانه", icon: Sprout },
+                  { to: "/shop", label: "فروشگاه", icon: ShoppingCart },
+                  { to: "/shop?filter=seasonal", label: "محصولات فصلی", icon: Package },
+                  { to: "/account", label: "سفارش‌های من", icon: Package },
+                  { to: "/dashboard", label: "پیشخوان من", icon: LayoutDashboard },
+                ].map(({ to, label, icon: Icon }) => (
+                  <Link
+                    key={to}
+                    to={to}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-secondary"
+                  >
+                    <Icon className="size-4 text-primary" />
+                    {label}
+                  </Link>
+                ))}
+                {!isAuthenticated && (
+                  <Button asChild className="mt-4 rounded-full">
+                    <Link to="/auth?returnTo=%2Fshop">ورود | ثبت‌نام</Link>
+                  </Button>
+                )}
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>

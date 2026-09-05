@@ -22,12 +22,18 @@ export function ProductCard({ product }: { product: ProductCardData }) {
   const { add } = useCart();
   const navigate = useNavigate();
   const inStock = product.stock > 0;
+  const lowStock = inStock && product.stock <= 5;
 
   return (
-    <div className="paper-grain group flex flex-col overflow-hidden rounded-lg border border-border bg-card shadow-sm transition-shadow hover:shadow-md">
-      <Link to={`/product/${product.slug}`} className="relative block">
-        <div className="img-vintage flex h-44 items-center justify-center border-b border-border/70 bg-secondary/50">
-          <span className="font-display text-5xl text-accent/60">
+    <div className="paper-grain group flex flex-col overflow-hidden rounded-lg border border-border bg-card transition-shadow hover:shadow-md">
+      <Link
+        to={`/product/${product.slug}`}
+        className="relative block overflow-hidden"
+        aria-label={product.name}
+      >
+        {/* Editorial image plate — monogram placeholder until product photography exists */}
+        <div className="img-vintage flex h-44 items-center justify-center border-b border-border/70 bg-secondary/50 transition-transform duration-300 ease-out group-hover:scale-[1.04]">
+          <span className="font-display text-5xl text-accent/50">
             {product.name.slice(0, 1)}
           </span>
         </div>
@@ -43,11 +49,12 @@ export function ProductCard({ product }: { product: ProductCardData }) {
         </div>
       </Link>
 
-      <div className="flex flex-1 flex-col gap-2 p-4">
-        <p className="text-[11px] text-muted-foreground">مبدأ: {product.origin}</p>
+      <div className="flex flex-1 flex-col gap-1.5 p-4">
+        {/* Origin eyebrow — where this product comes from */}
+        <p className="eyebrow">{product.origin}</p>
         <Link
           to={`/product/${product.slug}`}
-          className="font-display text-lg font-bold leading-7 hover:text-primary"
+          className="font-display text-lg font-bold leading-7 transition-colors hover:text-primary"
         >
           {product.name}
         </Link>
@@ -56,16 +63,22 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             {product.shortDescription}
           </p>
         )}
-        <div className="mt-auto flex items-end justify-between pt-2">
+        <div className="mt-auto flex items-end justify-between pt-3">
           <div>
             <div className="font-bold text-primary">
               {formatTomanShort(product.price)}
             </div>
-            <div className="text-[11px] text-muted-foreground">
+            <div className="micro text-muted-foreground">
               هر {product.unit}
+              {lowStock && (
+                <span className="text-accent-foreground">
+                  {" "}
+                  — فقط {toPersianDigits(product.stock)} باقی مانده
+                </span>
+              )}
             </div>
             {product.comparePrice && product.comparePrice > product.price && (
-              <div className="text-[11px] text-muted-foreground line-through">
+              <div className="micro text-muted-foreground line-through">
                 {formatTomanShort(product.comparePrice)}
               </div>
             )}

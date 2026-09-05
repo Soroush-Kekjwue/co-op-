@@ -211,6 +211,14 @@ const schema = defineSchema(
     })
       .index("productId", ["productId"])
       .index("userId", ["userId"]),
+
+    // Newsletter / community list. Email verified by double opt-in.
+    subscribers: defineTable({
+      email: v.string(),
+      status: v.union(v.literal("pending"), v.literal("active")),
+      subscribedAt: v.number(),
+      confirmedAt: v.optional(v.number()),
+    }).index("email", ["email"]),
   },
   {
     schemaValidation: false,

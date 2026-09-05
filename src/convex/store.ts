@@ -153,3 +153,17 @@ export const getFeaturedProducts = query({
     };
   },
 });
+
+/** Homepage discovery band: the freshest active products ("این هفته در تعاونی"). */
+export const getFreshArrivals = query({
+  args: {},
+  handler: async (ctx) => {
+    const products = await ctx.db
+      .query("products")
+      .withIndex("isActive", (q) => q.eq("isActive", true))
+      .collect();
+    return products
+      .sort((a, b) => b._creationTime - a._creationTime)
+      .slice(0, 4);
+  },
+});

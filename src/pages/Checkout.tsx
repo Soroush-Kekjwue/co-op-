@@ -13,8 +13,7 @@ import { useMutation, useQuery } from "convex/react";
 import { AlertTriangle, Loader2, Lock, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router";
-
-const SHIPPING_FLAT_RATE = 49_000;
+import { FREE_SHIPPING_THRESHOLD, SHIPPING_FLAT_RATE } from "@/convex/shared";
 
 export default function Checkout() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -35,7 +34,9 @@ export default function Checkout() {
     return { product: p, quantity, subtotal: p.price * quantity };
   });
   const subtotal = detailed.reduce((sum, d) => sum + d.subtotal, 0);
-  const total = subtotal + SHIPPING_FLAT_RATE;
+  const freeShipping = subtotal >= FREE_SHIPPING_THRESHOLD;
+  const shippingCost = freeShipping ? 0 : SHIPPING_FLAT_RATE;
+  const total = subtotal + shippingCost;
 
   if (!isLoading && !isAuthenticated) {
     return <Navigate to="/auth?returnTo=%2Fcheckout" replace />;
@@ -221,7 +222,9 @@ export default function Checkout() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">هزینه ارسال</span>
-                  <span>{formatToman(SHIPPING_FLAT_RATE)}</span>
+                  <span className={freeShipping ? "font-medium text-primary" : ""}>
+                    {freeShipping ? "رایگان" : formatToman(shippingCost)}
+                  </span>
                 </div>
                 <div className="flex justify-between font-bold">
                   <span>مبلغ قابل پرداخت</span>

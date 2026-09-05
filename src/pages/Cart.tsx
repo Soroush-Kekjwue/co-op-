@@ -3,14 +3,12 @@ import { Separator } from "@/components/ui/separator";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { api } from "@/convex/_generated/api";
-import type { Id } from "@/convex/_generated/dataModel";
 import { useCart } from "@/lib/cart";
 import { formatToman, toPersianDigits } from "@/lib/format";
 import { useQuery } from "convex/react";
 import { Minus, Plus, ShoppingBasket, Trash2 } from "lucide-react";
 import { Link } from "react-router";
-
-const SHIPPING_FLAT_RATE = 49_000;
+import { FREE_SHIPPING_THRESHOLD, SHIPPING_FLAT_RATE } from "@/convex/shared";
 
 export default function Cart() {
   const { items, update, remove, count } = useCart();
@@ -24,6 +22,9 @@ export default function Cart() {
     return { product: p, quantity, subtotal: p.price * quantity };
   });
   const subtotal = detailed.reduce((sum, d) => sum + d.subtotal, 0);
+  const freeShipping = subtotal >= FREE_SHIPPING_THRESHOLD;
+  const remainingForFreeShipping = FREE_SHIPPING_THRESHOLD - subtotal;
+  const progressPct = Math.min(100, Math.round((subtotal / FREE_SHIPPING_THRESHOLD) * 100));
 
   return (
     <div className="min-h-screen">
@@ -118,10 +119,32 @@ export default function Cart() {
                     </span>
                     <span>{formatToman(subtotal)}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">هزینه ارسال</span>
-                    <span>{formatToman(SHIPPING_FLAT_RATE)}</span>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">هزینه ارسال</span>
+                  <span className={freeShipping ? "font-medium text-primary" : ""}>
+                    {freeShipping ? "رایگان" : formatToman(SHIPPING_FLAT_RATE)}
+                  </span>
+                </div>
+                {!freeShipping && (
+                  <div className="rounded-md bg-secondary/60 p-3">
+                    <p className="text-xs leading-6 text-muted-foreground">
+                      فقط {formatToman(remainingForFreeShipping)} تا ارسال رایگان
+                    </p>
+                    <div
+                      className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-border"
+                      role="progressbar"
+                      aria-valuenow={progressPct}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-label="پیشرفت تا ارسال رایگان"
+                    >
+                      <div
+                        className="h-full rounded-full bg-primary transition-all duration-300"
+                        style={{ width: `${progressPct}%` }}
+                      />
+                    </div>
                   </div>
+                )}
                   <Separator className="my-3" />
                   <div className="flex justify-between font-bold">
                     <span>مبلغ قابل پرداخت</span>

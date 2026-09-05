@@ -1,6 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { FREE_SHIPPING_THRESHOLD, SHIPPING_FLAT_RATE } from "./shared";
 
 /**
  * Customer order flows.
@@ -11,7 +12,6 @@ import { mutation, query } from "./_generated/server";
  *  - each item logs an inventory movement ("sale")
  */
 
-const SHIPPING_FLAT_RATE = 49_000; // Toman; simple flat rate for MVP
 
 export const checkout = mutation({
   args: {
@@ -65,7 +65,8 @@ export const checkout = mutation({
     }
 
     const subtotal = snapshots.reduce((sum, s) => sum + s.subtotal, 0);
-    const total = subtotal + SHIPPING_FLAT_RATE;
+    const shippingCost = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FLAT_RATE;
+    const total = subtotal + shippingCost;
     const orderNumber = `CO-${Date.now().toString(36).toUpperCase()}`;
 
     const orderId = await ctx.db.insert("orders", {
@@ -73,7 +74,7 @@ export const checkout = mutation({
       orderNumber,
       status: "pending",
       subtotal,
-      shippingCost: SHIPPING_FLAT_RATE,
+      shippingCost,
       discount: 0,
       total,
       paymentStatus: "pending",
