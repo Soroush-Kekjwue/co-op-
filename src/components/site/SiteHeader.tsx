@@ -12,14 +12,14 @@ import { useAuth } from "@/hooks/use-auth";
 import { useCart } from "@/lib/cart";
 import { toPersianDigits } from "@/lib/format";
 import {
-  LogOut,
   LayoutDashboard,
+  LogOut,
   Package,
   Search,
   ShoppingCart,
   UserRound,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 
 export function SiteHeader() {
@@ -27,19 +27,6 @@ export function SiteHeader() {
   const { count } = useCart();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-
-  // Hide the platform toolbar on first mount (best effort, non-critical).
-  useEffect(() => {
-    const w = window.parent;
-    if (w) {
-      try {
-        // no-op: Vly toolbar manages itself
-      } catch {
-        // ignore
-      }
-      void w;
-    }
-  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,13 +42,11 @@ export function SiteHeader() {
   return (
     <header className="paper-grain sticky top-0 z-40 border-b border-border/80 bg-card/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4">
-        <Link to="/" className="flex items-center gap-2.5 shrink-0">
+        <Link to="/" className="flex shrink-0 items-center gap-2.5">
           <span className="vintage-stamp flex size-9 items-center justify-center font-display text-lg">
-            ب
+            هـ
           </span>
-          <span className="font-display text-xl font-bold text-primary">
-            بازار تعاونی
-          </span>
+          <span className="font-display text-xl text-primary">هم‌بن</span>
         </Link>
 
         <nav className="hidden items-center gap-5 text-sm md:flex">
@@ -71,7 +56,10 @@ export function SiteHeader() {
           <Link to="/shop" className="link-archival hover:text-primary">
             فروشگاه
           </Link>
-          <Link to="/shop?filter=seasonal" className="link-archival hover:text-primary">
+          <Link
+            to="/shop?filter=seasonal"
+            className="link-archival hover:text-primary"
+          >
             فصلی
           </Link>
           <Link to="/account" className="link-archival hover:text-primary">
@@ -109,9 +97,13 @@ export function SiteHeader() {
           {isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 rounded-full bg-background/60">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 rounded-full bg-background/60"
+                >
                   <UserRound className="size-4" />
-                  <span className="hidden sm:inline max-w-24 truncate">
+                  <span className="hidden max-w-24 truncate sm:inline">
                     {user?.name || user?.email || "حساب"}
                   </span>
                 </Button>
@@ -121,6 +113,12 @@ export function SiteHeader() {
                   {user?.email ?? "حساب کاربری"}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard">
+                    <LayoutDashboard className="ml-2 size-4" />
+                    پیشخوان من
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/account">
                     <Package className="ml-2 size-4" />

@@ -15,14 +15,15 @@ import { useMutation, useQuery } from "convex/react";
 import { Loader2, PackageSearch, X } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
+import type { Id } from "@/convex/_generated/dataModel";
 
 export default function Account() {
   const { user } = useAuth();
   const orders = useQuery(api.orders.myOrders, {});
   const cancel = useMutation(api.orders.cancel);
-  const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [cancellingId, setCancellingId] = useState<Id<"orders"> | null>(null);
 
-  const handleCancel = async (orderId: string) => {
+  const handleCancel = async (orderId: Id<"orders">) => {
     setCancellingId(orderId);
     try {
       await cancel({ orderId });
@@ -113,7 +114,7 @@ export default function Account() {
   );
 }
 
-function OrderItemsLine({ orderId }: { orderId: string }) {
+function OrderItemsLine({ orderId }: { orderId: Id<"orders"> }) {
   const data = useQuery(api.orders.getOrder, { orderId });
   if (!data) return null;
   return (

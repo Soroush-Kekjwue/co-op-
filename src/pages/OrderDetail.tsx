@@ -15,11 +15,17 @@ import {
 import { useQuery } from "convex/react";
 import { CheckCircle2, ClipboardList } from "lucide-react";
 import { Link, useParams, useLocation } from "react-router";
+import type { Id } from "@/convex/_generated/dataModel";
 
 export default function OrderDetail() {
-  const { orderId } = useParams<{ orderId: string }>();
+  const { orderId: rawOrderId } = useParams<{ orderId: string }>();
   const location = useLocation();
   const justOrdered = Boolean(location.state?.justOrdered);
+  // Treat the route param as a Convex Id only when it looks like one.
+  const orderId: Id<"orders"> | undefined =
+    rawOrderId && /^[0-9a-z]{16,}$/.test(rawOrderId)
+      ? (rawOrderId as Id<"orders">)
+      : undefined;
   const data = useQuery(
     api.orders.getOrder,
     orderId ? { orderId } : "skip",

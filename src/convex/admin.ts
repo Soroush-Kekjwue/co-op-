@@ -510,6 +510,68 @@ export const adjustStock = mutation({
 });
 
 // ---------------------------------------------------------------------------
+// Catalog listings (admin view: includes inactive rows)
+// ---------------------------------------------------------------------------
+
+export const listAllProducts = query({
+  args: {},
+  handler: async (ctx) => {
+    await requireAdmin(ctx);
+    const products = await ctx.db.query("products").collect();
+    const sorted = products.sort((a, b) => b._creationTime - a._creationTime);
+    const withCategory = await Promise.all(
+      sorted.map(async (p) => {
+        const category = await ctx.db.get(p.categoryId);
+        return { product: p, categoryName: category?.name ?? "—" };
+      }),
+    );
+    return withCategory;
+  },
+});
+
+export const listAllCategories = query({
+  args: {},
+  handler: async (ctx) => {
+    await requireAdmin(ctx);
+    return await ctx.db
+      .query("categories")
+      .withIndex("sortOrder")
+      .order("asc")
+      .collect();
+  },
+});
+
+export const listAllSuppliers = query({
+  args: {},
+  handler: async (ctx) => {
+    await requireAdmin(ctx);
+    return await ctx.db.query("suppliers").collect();
+  },
+});
+
+export const listBatches = query({
+  args: { productId: v.optional(v.id("products")) },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+    const batches = args.productId
+      ? await ctx.db
+          .query("batches")
+          .withIndex("productId", (q) => q.eq("productId", args.productId!))
+          .collect()
+      : await ctx.db.query("batches").collect();
+    const withProduct = await Promise.all(
+      batches.map(async (b) => {
+        const product = await ctx.db.get(b.productId);
+        return { batch: b, productName: product?.name ?? "—" };
+      }),
+    );
+    return withProduct.sort(
+      (a, b) => b.batch._creationTime - a.batch._creationTime,
+    );
+  },
+});
+
+// ---------------------------------------------------------------------------
 // Demo seed (admin-only) — sample cooperative catalog
 // ---------------------------------------------------------------------------
 
@@ -531,11 +593,11 @@ export const seedDemo = mutation({
     const nutsId = await cat("خشکبار", "nuts", 6);
 
     const supplierOrange = await ctx.db.insert("suppliers", {
-      name: "باغ تعاونی خودِ تعاونی",
-      slug: "own-orange-grove",
+      name: "باغ تعاونی هم‌بن",
+      slug: "hem-ben-grove",
       region: "مازندران، سوادکوه",
       description:
-        "باغ پرتقال متعلق به تعاونی؛ برداشت دستی و ارسال مستقیم از باغ.",
+        "باغ پرتقال متعلق به تعاونی هم‌بن؛ برداشت دستی و ارسال مستقیم از باغ.",
       isActive: true,
     });
     const supplierRice = await ctx.db.insert("suppliers", {
@@ -786,7 +848,7 @@ export const seedDemo = mutation({
         productionDate: def.productionDate,
         harvestDate: def.harvestDate,
         packagingDate: def.packagingDate,
-        notes: "باغ تعاونی؛ برداشت دستی",
+        notes: "باغ تعاونی هم‌بن؛ برداشت دستی",
         isActive: true,
       });
       await ctx.db.insert("qualityChecks", {
@@ -805,7 +867,7 @@ export const seedDemo = mutation({
       type: "in",
       quantity: 240,
       referenceType: "seed",
-      notes: "ورود اولیه بچ ORG-1404-001 از باغ تعاونی",
+      notes: "ورود اولیه بچ ORG-1404-001 از باغ تعاونی هم‌بن",
     });
 
     void grainsId;

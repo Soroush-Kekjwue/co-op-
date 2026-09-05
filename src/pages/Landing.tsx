@@ -7,12 +7,7 @@ import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/hooks/use-auth";
 import { toPersianDigits } from "@/lib/format";
 import { useQuery } from "convex/react";
-import {
-  ClipboardCheck,
-  MapPin,
-  Store,
-  Users,
-} from "lucide-react";
+import { ClipboardCheck, MapPin, Sprout, Store, Users } from "lucide-react";
 import { Link } from "react-router";
 
 export default function Landing() {
@@ -27,21 +22,25 @@ export default function Landing() {
       <SiteHeader />
 
       {/* Hero */}
-      <section className="paper-grain relative overflow-hidden border-b border-border/70 bg-secondary/40">
+      <section className="relative overflow-hidden border-b border-border/70 bg-secondary/40">
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 md:grid-cols-2 md:py-24">
           <div className="relative z-10">
-            <Badge variant="outline" className="vintage-stamp mb-5 bg-card/80">
+            <Badge
+              variant="outline"
+              className="mb-5 gap-1.5 border-primary/30 bg-card px-3 py-1 text-primary"
+            >
+              <Sprout className="size-3.5" />
               تعاونی تولید و تأمین مواد غذایی
             </Badge>
-            <h1 className="font-display text-4xl font-bold leading-[1.5] md:text-5xl md:leading-[1.5]">
-              غذای اصیل،
+            <h1 className="font-display text-4xl font-extrabold leading-[1.4] md:text-5xl md:leading-[1.4]">
+              خوراک درست،
               <br />
               از مزرعه تا سفره
             </h1>
             <p className="mt-5 max-w-md text-base leading-8 text-muted-foreground">
-              تعاونی ما میان تولیدکنندگان منتخب و خانوارها می‌ایستد؛ با منشأ
-              مشخص، بچ ثبت‌شده و کنترل کیفیت مستند. اولین محصول، پرتقال باغ
-              خودمان در سوادکوه است.
+              هم‌بن میان تولیدکنندگان منتخب و خانوارها می‌ایستد؛ بدون واسطه‌های
+              اضافه. هر محصول منشأ مشخص، بچ ثبت‌شده و کنترل کیفیت مستند دارد.
+              اولین محصول ما، پرتقال باغ خودمان در سوادکوه است.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Button asChild size="lg" className="rounded-full">
@@ -54,13 +53,13 @@ export default function Landing() {
                   variant="outline"
                   className="rounded-full bg-card/60"
                 >
-                  <Link to="/auth?returnTo=%2Fshop">ورود اعضا</Link>
+                  <Link to="/auth?returnTo=%2Fdashboard">عضویت در هم‌بن</Link>
                 </Button>
               )}
             </div>
-            <div className="mt-8 flex items-center gap-6 text-sm text-muted-foreground">
+            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
               <span className="flex items-center gap-1.5">
-                <MapPin className="size-4 text-primary" /> مبدأ مشخص
+                <MapPin className="size-4 text-primary" /> منشأ مشخص
               </span>
               <span className="flex items-center gap-1.5">
                 <ClipboardCheck className="size-4 text-primary" /> کنترل کیفیت
@@ -71,15 +70,15 @@ export default function Landing() {
             </div>
           </div>
           <div className="relative z-10 hidden justify-center md:flex">
-            <div className="archival-frame paper-grain relative w-72 rounded-lg bg-card p-8 text-center">
+            <div className="archival-frame relative w-72 rounded-lg bg-card p-8 text-center">
               <div className="vintage-stamp mx-auto mb-4 flex size-20 items-center justify-center font-display text-4xl">
-                ب
+                هـ
               </div>
               <p className="font-display text-xl font-bold">از تولید تا سفره</p>
               <p className="mt-2 text-xs leading-6 text-muted-foreground">
                 تولیدکننده ← تعاونی ← کنترل کیفیت ← سفره شما
               </p>
-              <div className="divider-ornate mt-4 text-xs">
+              <div className="divider-ornate mt-4 justify-center text-xs">
                 <span>بچ ثبت‌شده</span>
               </div>
               <p className="mt-1 font-mono text-xs text-accent-foreground">
@@ -94,16 +93,16 @@ export default function Landing() {
       {categories && categories.length > 0 && (
         <section className="mx-auto max-w-6xl px-4 py-12">
           <div className="divider-ornate mb-8">
-            <h2 className="font-display text-2xl font-bold">دسته‌بندی‌ها</h2>
+            <h2 className="font-display text-2xl font-extrabold">دسته‌بندی‌ها</h2>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {categories.map((category) => (
               <Link
                 key={category._id}
                 to={`/shop?category=${category.slug}`}
-                className="paper-grain flex flex-col items-center gap-2 rounded-lg border border-border bg-card p-5 text-center transition-shadow hover:shadow-md"
+                className="paper-grain flex flex-col items-center gap-2 rounded-lg border border-border bg-card p-5 text-center transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
               >
-                <span className="vintage-stamp flex size-11 items-center justify-center font-display text-xl">
+                <span className="flex size-11 items-center justify-center rounded-full bg-primary/10 font-display text-xl text-primary">
                   {category.name.slice(0, 1)}
                 </span>
                 <span className="text-sm font-medium">{category.name}</span>
@@ -116,7 +115,7 @@ export default function Landing() {
       {/* Featured */}
       <section className="mx-auto max-w-6xl px-4 pb-12">
         <div className="divider-ornate mb-8">
-          <h2 className="font-display text-2xl font-bold">منتخب تعاونی</h2>
+          <h2 className="font-display text-2xl font-extrabold">منتخب هم‌بن</h2>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {featured.map((p) => (
@@ -127,10 +126,12 @@ export default function Landing() {
 
       {/* Seasonal */}
       {seasonal.length > 0 && (
-        <section className="paper-grain border-y border-border/70 bg-secondary/30">
+        <section className="border-y border-border/70 bg-secondary/30">
           <div className="mx-auto max-w-6xl px-4 py-12">
             <div className="divider-ornate mb-8">
-              <h2 className="font-display text-2xl font-bold">محصولات فصلی</h2>
+              <h2 className="font-display text-2xl font-extrabold">
+                محصولات فصلی
+              </h2>
             </div>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {seasonal.map((p) => (
@@ -144,14 +145,16 @@ export default function Landing() {
       {/* Why us */}
       <section className="mx-auto max-w-6xl px-4 py-14">
         <div className="divider-ornate mb-10">
-          <h2 className="font-display text-2xl font-bold">چرا بازار تعاونی؟</h2>
+          <h2 className="font-display text-2xl font-extrabold">
+            چرا هم‌بن؟
+          </h2>
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {[
             {
               icon: MapPin,
               title: "منشأ مشخص",
-              text: "استان، شهر و باغ یا شالیزار مبدأ هر محصول ثبت می‌شود.",
+              text: "استان، شهر و باغ یا شالیزار مبدأ هر محصول با دقت ثبت می‌شود.",
             },
             {
               icon: Users,
@@ -161,17 +164,17 @@ export default function Landing() {
             {
               icon: ClipboardCheck,
               title: "کنترل کیفیت مستند",
-              text: "هر بچ پیش از عرضه بررسی و نتیجه آن ثبت می‌شود.",
+              text: "هر بچ پیش از عرضه بررسی می‌شود و نتیجه آن در شناسنامه محصول ثبت می‌گردد.",
             },
             {
               icon: Store,
-              title: "خرید مستقیم‌تر",
-              text: "قیمت منصفانه برای تولیدکننده، قیمت شفاف برای شما.",
+              title: "قیمت شفاف",
+              text: "سهم منصفانه تولیدکننده، قیمت روشن برای شما؛ بدون هزینه پنهان.",
             },
           ].map(({ icon: Icon, title, text }) => (
             <div
               key={title}
-              className="paper-grain rounded-lg border border-border bg-card p-6"
+              className="paper-grain rounded-lg border border-border bg-card p-6 transition-all hover:-translate-y-0.5 hover:shadow-md"
             >
               <div className="mb-4 flex size-11 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <Icon className="size-5" />
@@ -186,10 +189,10 @@ export default function Landing() {
       </section>
 
       {/* Story / CTA */}
-      <section className="paper-grain border-t border-border/70 bg-secondary/30">
+      <section className="border-t border-border/70 bg-secondary/30">
         <div className="mx-auto max-w-4xl px-4 py-16 text-center">
           <p className="text-sm text-muted-foreground">داستان تولید ما</p>
-          <h2 className="mt-3 font-display text-3xl font-bold leading-[1.6]">
+          <h2 className="mt-3 font-display text-3xl font-extrabold leading-[1.6]">
             «از درخت تا سبد شما،
             <br />
             با یک بچ ثبت‌شده»
@@ -199,9 +202,21 @@ export default function Landing() {
             بسته‌بندی همان روز و ارسال مستقیم. روی هر جعبه، شماره بچ و تاریخ
             برداشت را می‌بینید.
           </p>
-          <Button asChild size="lg" className="mt-8 rounded-full">
-            <Link to="/shop">مشاهده محصولات</Link>
-          </Button>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <Button asChild size="lg" className="rounded-full">
+              <Link to="/shop">مشاهده محصولات</Link>
+            </Button>
+            {!user && (
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="rounded-full bg-card"
+              >
+                <Link to="/auth?returnTo=%2Fdashboard">عضویت در هم‌بن</Link>
+              </Button>
+            )}
+          </div>
           <p className="mt-3 text-xs text-muted-foreground">
             هم‌اکنون {toPersianDigits(featured.length + seasonal.length)} محصول
             منتخب در فروشگاه

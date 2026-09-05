@@ -186,6 +186,31 @@ const schema = defineSchema(
       quantity: v.number(),
       subtotal: v.number(),
     }).index("orderId", ["orderId"]),
+
+    // Direct message thread between a signed-in member and the cooperative.
+    // topic is optional so admins can start replies in the same thread.
+    messages: defineTable({
+      userId: v.id("users"),
+      authorId: v.id("users"), // who actually wrote this message
+      authorIsAdmin: v.boolean(),
+      body: v.string(),
+      topic: v.optional(v.string()),
+      readByAdmin: v.boolean(),
+      readByUser: v.boolean(),
+    }).index("userId", ["userId"]), // scan order is (userId, _creationTime)
+
+    // Public questions & reviews under each product. Hidden (unapproved)
+    // comments are visible only to their author and to admins.
+    comments: defineTable({
+      productId: v.id("products"),
+      userId: v.id("users"),
+      authorName: v.string(), // snapshot at posting time
+      body: v.string(),
+      rating: v.optional(v.number()), // 1..5
+      isApproved: v.boolean(),
+    })
+      .index("productId", ["productId"])
+      .index("userId", ["userId"]),
   },
   {
     schemaValidation: false,

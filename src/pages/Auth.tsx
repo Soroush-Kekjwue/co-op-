@@ -100,13 +100,11 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
       <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4 py-16">
         <Link to="/" className="mb-8 flex flex-col items-center gap-3">
           <span className="vintage-stamp flex size-14 items-center justify-center bg-card font-display text-3xl">
-            ب
+            هـ
           </span>
-          <span className="font-display text-2xl font-bold text-primary">
-            بازار تعاونی
-          </span>
+          <span className="font-display text-2xl text-primary">هم‌بن</span>
           <span className="text-xs text-muted-foreground">
-            از تولید تا سفره
+            از مزرعه تا سفره شما
           </span>
         </Link>
 
@@ -115,10 +113,11 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
             <>
               <CardHeader className="text-center">
                 <CardTitle className="font-display text-xl">
-                  ورود | ثبت‌نام
+                  ورود | عضویت
                 </CardTitle>
                 <CardDescription>
-                  ایمیل خود را وارد کنید؛ کد تأیید برایتان ارسال می‌شود.
+                  ایمیل خود را وارد کنید؛ کد تأیید برایتان ارسال می‌شود. با اولین
+                  ورود، حساب عضویت هم‌بن شما ساخته می‌شود.
                 </CardDescription>
               </CardHeader>
               <form onSubmit={handleEmailSubmit}>
@@ -172,11 +171,11 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                       disabled={isLoading}
                     >
                       <UserRound className="ml-2 size-4" />
-                      ورود بدون ثبت‌نام (مهمان)
+                      مرور سریع بدون عضویت (مهمان)
                     </Button>
                     <p className="mt-2 text-center text-[11px] leading-5 text-muted-foreground">
-                      حساب مهمان فقط برای مرور سریع است؛ برای ثبت سفارش باید با
-                      ایمیل وارد شوید.
+                      حساب مهمان فقط برای مرور فروشگاه است؛ برای ثبت سفارش و
+                      ارسال پیام باید با ایمیل وارد شوید.
                     </p>
                   </div>
                 </CardContent>

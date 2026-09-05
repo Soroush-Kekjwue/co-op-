@@ -1,32 +1,42 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { api } from "@/convex/_generated/api";
+import type { Id } from "@/convex/_generated/dataModel";
+import { useAuth } from "@/hooks/use-auth";
 import { useCart } from "@/lib/cart";
 import {
   formatIsoDate,
+  formatJalali,
   formatToman,
   QUALITY_STATUS_LABELS,
   STATUS_BADGE_CLASSES,
   toPersianDigits,
 } from "@/lib/format";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import {
   ArrowLeft,
   CalendarDays,
   ClipboardCheck,
   Leaf,
+  Loader2,
   MapPin,
+  MessagesSquare,
   Minus,
   Plus,
   ScrollText,
   ShoppingCart,
+  Star,
   Thermometer,
+  Trash2,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
+import { toast } from "sonner";
 
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -320,8 +330,223 @@ export default function ProductDetail() {
             </div>
           )}
         </section>
+
+        {/* Questions & reviews */}
+        <ProductComments productId={product._id} slug={slug ?? ""} />
       </main>
       <SiteFooter />
     </div>
+  );
+}
+
+function StarRating({
+  value,
+  onChange,
+}: {
+  value: number;
+  onChange?: (v: number) => void;
+}) {
+  return (
+    <div className="flex items-center gap-0.5" dir="ltr">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          type="button"
+          aria-label={`${star} ستاره`}
+          className={
+            onChange
+              ? "transition-transform hover:scale-110"
+              : "cursor-default"
+          }
+          onClick={onChange ? () => onChange(star) : undefined}
+        >
+          <Star
+            className={`size-4 ${
+              star <= value
+                ? "fill-accent text-accent"
+                : "fill-muted text-muted"
+            }`}
+          />
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function ProductComments({
+  productId,
+  slug,
+}: {
+  productId: Id<"products">;
+  slug: string;
+}) {
+  const { isAuthenticated } = useAuth();
+  const data = useQuery(api.comments.listForProduct, { productId });
+  const addComment = useMutation(api.comments.add);
+  const removeMine = useMutation(api.comments.removeMine);
+  const [body, setBody] = useState("");
+  const [rating, setRating] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!body.trim()) return;
+    setSubmitting(true);
+    try {
+      await addComment({
+        productId,
+        body: body.trim(),
+        rating: rating > 0 ? rating : undefined,
+      });
+      setBody("");
+      setRating(0);
+      toast.success("دیدگاه شما ثبت شد؛ سپاس از همراهی!");
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "ثبت دیدگاه ناموفق بود.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (commentId: Id<"comments">) => {
+    try {
+      await removeMine({ commentId });
+      toast.success("دیدگاه شما حذف شد.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "حذف ناموفق بود.");
+    }
+  };
+
+  return (
+    <section className="mt-14">
+      <div className="divider-ornate mb-6">
+        <h2 className="flex items-center gap-2 font-display text-2xl font-extrabold">
+          <MessagesSquare className="size-5 text-primary" />
+          پرسش‌ها و دیدگاه‌ها
+        </h2>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+        {/* List */}
+        <div>
+          {data === undefined ? (
+            <div className="space-y-3">
+              {Array.from({ length: 2 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-20 animate-pulse rounded-lg bg-secondary/40"
+                />
+              ))}
+            </div>
+          ) : data.totalCount === 0 ? (
+            <div className="rounded-lg border border-dashed border-border bg-card p-10 text-center text-sm text-muted-foreground">
+              هنوز دیدگاهی ثبت نشده؛ اولین نفر باشید!
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {data.comments.map((c) => (
+                <div
+                  key={c._id}
+                  className="paper-grain rounded-lg border border-border bg-card p-4"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="flex size-8 items-center justify-center rounded-full bg-secondary font-bold text-secondary-foreground">
+                        {c.authorName.slice(0, 1)}
+                      </span>
+                      <span className="text-sm font-medium">{c.authorName}</span>
+                      {c.rating ? <StarRating value={c.rating} /> : null}
+                      {!c.isApproved && (
+                        <Badge
+                          variant="outline"
+                          className="text-[10px] text-muted-foreground"
+                        >
+                          نمایان برای شما
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      {formatJalali(c.creationTime)}
+                      {c.isMine && (
+                        <button
+                          type="button"
+                          aria-label="حذف دیدگاه"
+                          className="text-muted-foreground hover:text-destructive"
+                          onClick={() => handleDelete(c._id)}
+                        >
+                          <Trash2 className="size-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <p className="mt-2.5 text-sm leading-7 text-foreground/90">
+                    {c.body}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Form */}
+        <div>
+          <div className="paper-grain rounded-lg border border-border bg-card p-5">
+            <h3 className="font-display text-base font-bold">
+              دیدگاه خود را بنویسید
+            </h3>
+            {data && data.averageRating !== null && (
+              <p className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+                <StarRating value={Math.round(data.averageRating)} />
+                میانگین {toPersianDigits(data.averageRating.toFixed(1))} از{" "}
+                {toPersianDigits(data.ratingCount)} امتیاز
+              </p>
+            )}
+            {isAuthenticated ? (
+              <form onSubmit={handleSubmit} className="mt-4 space-y-3">
+                <div>
+                  <Label className="text-xs text-muted-foreground">
+                    امتیاز شما (اختیاری)
+                  </Label>
+                  <div className="mt-1.5">
+                    <StarRating value={rating} onChange={setRating} />
+                  </div>
+                </div>
+                <Textarea
+                  value={body}
+                  onChange={(e) => setBody(e.target.value)}
+                  rows={4}
+                  maxLength={2000}
+                  placeholder="تجربه‌تان از این محصول را بنویسید یا سوالی بپرسید…"
+                  required
+                />
+                <Button
+                  type="submit"
+                  className="w-full rounded-full"
+                  disabled={submitting || !body.trim()}
+                >
+                  {submitting && <Loader2 className="size-4 animate-spin" />}
+                  ثبت دیدگاه
+                </Button>
+              </form>
+            ) : (
+              <div className="mt-4 text-center">
+                <p className="text-sm leading-7 text-muted-foreground">
+                  برای ثبت دیدگاه ابتدا وارد حساب خود شوید.
+                </p>
+                <Button asChild size="sm" className="mt-3 rounded-full">
+                  <Link
+                    to={`/auth?returnTo=${encodeURIComponent(`/product/${slug}`)}`}
+                  >
+                    ورود | عضویت
+                  </Link>
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }

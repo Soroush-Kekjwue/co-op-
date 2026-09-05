@@ -1,4 +1,7 @@
 import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Sprout } from "lucide-react";
+import { Link } from "react-router";
 
 export default function NotFound() {
   return (
@@ -6,19 +9,32 @@ export default function NotFound() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen flex flex-col"
+      className="flex min-h-screen flex-col bg-background"
     >
-
-      
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-center">
-        <div className="max-w-5xl mx-auto relative px-4">
-          <div className="flex items-center justify-center min-h-[200px]">
-            <div className="text-center">
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">404</h1>
-              <p className="text-lg text-gray-600">Page Not Found</p>
-            </div>
-          </div>
+      <div className="flex flex-1 flex-col items-center justify-center px-4 text-center">
+        <span className="vintage-stamp mb-6 flex size-16 items-center justify-center font-display text-3xl">
+          هـ
+        </span>
+        <h1 className="font-display text-6xl font-extrabold text-primary">
+          ۴۰۴
+        </h1>
+        <p className="mt-3 font-display text-xl font-bold">
+          این صفحه پیدا نشد
+        </p>
+        <p className="mt-2 max-w-sm text-sm leading-7 text-muted-foreground">
+          آدرسی که دنبال آن هستید وجود ندارد یا جابه‌جا شده است. از فروشگاه
+          هم‌بن دیدن کنید.
+        </p>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <Button asChild className="rounded-full">
+            <Link to="/shop">
+              <Sprout className="size-4" />
+              مشاهده محصولات
+            </Link>
+          </Button>
+          <Button asChild variant="outline" className="rounded-full">
+            <Link to="/">صفحه اصلی</Link>
+          </Button>
         </div>
       </div>
     </motion.div>
